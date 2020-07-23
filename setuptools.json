@@ -9,7 +9,7 @@
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.6"
     ],
-    "description": "More Imports! - Delayed importing features",
+    "description": "More Imports! - Delayed importing",
     "install_requires": [],
     "license": "MPL 2.0",
     "name": "mo-imports",

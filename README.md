@@ -1,4 +1,6 @@
-# More Imports! - Delayed importing features 
+# More Imports! - Delayed importing 
+
+A couple of methods to make late importing cleaner
 
 ## Problem
 
