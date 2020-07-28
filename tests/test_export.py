@@ -1,6 +1,9 @@
 from mo_testing.fuzzytestcase import FuzzyTestCase
 
 
+
+
+
 class TestExport(FuzzyTestCase):
 
     def test_modname_value(self):
@@ -27,3 +30,5 @@ class TestExport(FuzzyTestCase):
     def test_missing_expect(self):
         pass
 
+    def test_delay_import(self):
+        pass
