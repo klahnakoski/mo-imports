@@ -173,7 +173,7 @@ This is fine for rarely run code, but there is an undesirable overhead because i
 
 ### Bad Solution: Use the `_late_import()` pattern
 
-When other options do not work work, then importing late is the remaining option
+When other bad solutions do not work work, then importing late is the remaining option
 
 **foos.py**
 
@@ -200,6 +200,6 @@ def bar():
     foo()
 ```
 
-Placeholders variables are added, which linters complain about type. There is the added `_late_import()` method. Run risk it is not run everywhere as needed.  This has less overhead than an import, but there is still a check.
+Placeholders variables are added, which linters complain about type. There is the added `_late_import()` method. You risk it is not run everywhere as needed. This has less overhead than an inline import, but there is still a check.
  
 
