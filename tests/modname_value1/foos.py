@@ -6,4 +6,4 @@ def foo():
     bar()
 
 
-export("tests.modname_value.bars", foo)
+export("tests.modname_value1.bars", foo)

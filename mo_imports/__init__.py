@@ -18,11 +18,11 @@ from time import time, sleep
 from mo_future import text, allocate_lock
 
 DEBUG = False
-
+WAIT_FOR_EXPORT = 10  # SECONDS TO WAIT FROM MOST RECENT expect() TO LAST export()
 
 _locker = allocate_lock()
 _expectations = []
-_expiry = time() + 10
+_expiry = None
 _monitor = None
 _nothing = object()
 _set = object.__setattr__
@@ -37,6 +37,9 @@ def expect(*names):
     :param names: MODULE VARIABLES THAT WILL BE FILLED BY ANOTHER MODULE
     :return: PLACEHOLDERS THAT CAN BE USED UNTIL FILL HAPPENS len(output)==len(names)
     """
+
+    if not names:
+        _error("expecting at least one name")
 
     # GET MODULE OF THE CALLER
     caller_frame = inspect.stack()[1]
@@ -53,13 +56,17 @@ def expect(*names):
         for name in names:
             print(">>> " + desc.module.__name__ + " is expecting " + name)
 
-    return output
+    if len(output) == 1:
+        return output[0]
+    else:
+        return output
 
 
 class Expecting(object):
     """
     CLASS TO USE AS A MODULE EXPORT PLACEHOLDER UNTIL AN ACTUAL VALUE IS INSERTED
     """
+
     __slots__ = ["module", "name", "frame"]
 
     def __init__(self, module, name, frame):
@@ -75,7 +82,7 @@ class Expecting(object):
         _set(self, "name", name)
         _set(self, "frame", frame)
         with _locker:
-            _expiry = time() + 10
+            _expiry = time() + WAIT_FOR_EXPORT
             _expectations.append(self)
             if not _monitor:
                 _monitor = Thread(target=worker)
@@ -83,7 +90,11 @@ class Expecting(object):
 
     def __call__(self, *args, **kwargs):
         _error(
-            "missing expected call export(\"" + self.module.__name__ + "\", " + self.name + ")"
+            'missing expected call export("'
+            + self.module.__name__
+            + '", '
+            + self.name
+            + ")"
         )
 
     def __getattr__(self, item):
@@ -139,13 +150,12 @@ def export(module, name, value=_nothing):
             except Exception:
                 pass
         else:
-            _error(
-                "Can not find variable holding a " + value.__class__.__name__
-            )
+            _error("Can not find variable holding a " + value.__class__.__name__)
     if value is _nothing:
         # ASSUME CALLER MODULE IS USED
         frame = inspect.stack()[1]
         value = inspect.getmodule(frame[0])
+
 
     desc = getattr(module, name, None)
     if isinstance(desc, Expecting):
@@ -183,7 +193,11 @@ def worker():
 
         for d in done:
             sys.stderr.write(
-                "missing expected call export(\"" + d.module.__name__ + "\", " + d.name + ")\n"
+                'missing expected call export("'
+                + d.module.__name__
+                + '", '
+                + d.name
+                + ")\n"
             )
         _error("Missing export() calls")
 
@@ -213,26 +227,42 @@ class DelayedImport(object):
         _set(self, "module", module)
 
     def _import_now(self):
+        # FIND MODULE VARIABLE THAT HOLDS self
+        caller = _get(self, "caller")
+        names = []
+        for n in dir(caller):
+            try:
+                if getattr(caller, n) is self:
+                    names.append(n)
+            except Exception:
+                pass
+
+        if not names:
+            _error(
+                "Can not find variable holding a " + self.__class__.__name__
+            )
+
         module = _get(self, "module")
         path = module.split(".")
-        module_name, short_name = path[:-1], path[-1]
-        m = importlib.import_module(module_name)
+        module_name, short_name = "".join(path[:-1]), path[-1]
+        try:
+            m = importlib.import_module(module_name)
+            val = getattr(m, short_name)
 
-        setattr(_get(self, "caller"), short_name, m)
-        return m
+            for n in names:
+                setattr(caller, n, val)
+            return m
+        except Exception as cause:
+            _error("Can not load " + _get(self, "module") + " caused by " + text(cause))
 
     def __call__(self, *args, **kwargs):
         m = DelayedImport._import_now(self)
         return m()
 
-    def  __getitem__(self, item):
+    def __getitem__(self, item):
         m = DelayedImport._import_now(self)
         return m[item]
 
     def __getattribute__(self, item):
         m = DelayedImport._import_now(self)
         return getattr(m, item)
-
-
-
-
