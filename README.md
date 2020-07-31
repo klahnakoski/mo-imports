@@ -39,7 +39,7 @@ All your cyclic dependencies are covered with this one pattern: Break cycles by 
 ```python
 from mo_imports import expect
 
-bar, = expect("bar")
+bar = expect("bar")
 
 def foo():
     bar()

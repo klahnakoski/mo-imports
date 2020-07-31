@@ -7,4 +7,4 @@ def foo():
     bar()
 
 
-export(bars, "foos")
+export(bars, "alt", foo)

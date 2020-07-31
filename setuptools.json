@@ -55,7 +55,7 @@
             "```python",
             "from mo_imports import expect",
             "",
-            "bar, = expect(\"bar\")",
+            "bar = expect(\"bar\")",
             "",
             "def foo():",
             "    bar()",
