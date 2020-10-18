@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 import importlib
 import inspect
 import sys
-from threading import Thread
+from threading import Thread, Event
 from time import time, sleep
 
 from mo_future import text, allocate_lock
@@ -76,7 +76,7 @@ class Expecting(object):
         :param name:
         :param frame:
         """
-        global _monitor, _expiry
+        global _monitor, _expiry, _event
 
         _set(self, "module", module)
         _set(self, "name", name)
@@ -85,7 +85,8 @@ class Expecting(object):
             _expiry = time() + WAIT_FOR_EXPORT
             _expectations.append(self)
             if not _monitor:
-                _monitor = Thread(target=worker)
+                _event = Event()
+                _monitor = Thread(target=worker, args=[_event])
                 _monitor.start()
 
     def __call__(self, *args, **kwargs):
@@ -162,6 +163,8 @@ def export(module, name, value=_nothing):
             for i, e in enumerate(_expectations):
                 if desc is e:
                     del _expectations[i]
+                    if not _expectations:
+                        _event.set()
                     break
             else:
                 _error(module.__name__ + " is not expecting an export to " + name)
@@ -173,20 +176,19 @@ def export(module, name, value=_nothing):
     setattr(module, name, value)
 
 
-def worker():
+def worker(please_stop):
     global _expectations, _monitor
 
     if DEBUG:
         print(">>> expectation thread started")
     while True:
-        sleep(_expiry - time())
+        please_stop.wait(_expiry - time())
         with _locker:
+            if not _expectations:
+                _monitor = None
+                break
             if _expiry >= time():
                 continue
-
-            _monitor = None
-            if not _expectations:
-                break
 
             done, _expectations = _expectations, []
 
@@ -224,8 +226,12 @@ class DelayedImport(object):
         _set(self, "module", module)
 
     def _import_now(self):
-        # FIND MODULE VARIABLE THAT HOLDS self
+        module = _get(self, "module")
         caller_name = _get(self, "caller")
+        if not caller_name:
+            return module
+
+        # FIND MODULE VARIABLE THAT HOLDS self
         caller = importlib.import_module(caller_name)
         names = []
         for n in dir(caller):
@@ -238,12 +244,13 @@ class DelayedImport(object):
         if not names:
             _error("Can not find variable holding a " + self.__class__.__name__)
 
-        module = _get(self, "module")
         path = module.split(".")
         module_name, short_name = ".".join(path[:-1]), path[-1]
         try:
             m = importlib.import_module(module_name)
             val = getattr(m, short_name)
+            _set(self, "module", val)
+            _set(self, "caller", None)
 
             for n in names:
                 setattr(caller, n, val)
@@ -261,4 +268,5 @@ class DelayedImport(object):
 
     def __getattribute__(self, item):
         m = DelayedImport._import_now(self)
+        print("item")
         return getattr(m, item)
