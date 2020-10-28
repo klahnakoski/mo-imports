@@ -10,7 +10,7 @@
         "Programming Language :: Python :: 3.6"
     ],
     "description": "More Imports! - Delayed importing",
-    "install_requires": ["mo-future>=3.89.20246"],
+    "install_requires": ["mo-future==3.130.20302"],
     "license": "MPL 2.0",
     "long_description": {
         "$concat": [
@@ -227,5 +227,5 @@
     "name": "mo-imports",
     "packages": ["mo_imports"],
     "url": "https://github.com/klahnakoski/mo-imports",
-    "version": "3.108.20292"
+    "version": "3.132.20302"
 }
