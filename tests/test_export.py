@@ -1,4 +1,4 @@
-from mo_testing.fuzzytestcase import FuzzyTestCase
+from unittest import TestCase
 
 import mo_imports
 from mo_imports import delay_import
@@ -6,7 +6,7 @@ from mo_imports import delay_import
 Log = delay_import("mo_logs.Log")
 
 
-class TestExport(FuzzyTestCase):
+class TestExport(TestCase):
 
     @classmethod
     def setUpClass(cls):
