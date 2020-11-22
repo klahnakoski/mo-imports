@@ -269,5 +269,4 @@ class DelayedImport(object):
 
     def __getattribute__(self, item):
         m = DelayedImport._import_now(self)
-        print("item")
         return getattr(m, item)
