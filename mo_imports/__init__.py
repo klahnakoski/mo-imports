@@ -212,6 +212,12 @@ def _error(description):
 
 
 def delay_import(module):
+    """
+    RETURN AN OBJECT THAT WILL CONVERT TO GIVEN INSTANCE WHEN "USED"
+    "USED" MEANS CALLING ONE OF __call__, __getattribute__, __getitem__
+    :param module: FULL MODULE NAME
+    :return: A DelayedImport OBJECT THAT WILL REPLACE ITSELF WHEN USED
+    """
     globals = sys._getframe(1).f_globals
     caller_name = globals["__name__"]
 
