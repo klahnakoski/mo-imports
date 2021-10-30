@@ -88,13 +88,7 @@ class Expecting(object):
                 _monitor.start()
 
     def __call__(self, *args, **kwargs):
-        _error(
-            'missing expected call export("'
-            + self.module.__name__
-            + '", '
-            + self.name
-            + ")"
-        )
+        _error(f'missing expected call export("{self.module.__name__}", {self.name})')
 
     def __getattr__(self, item):
         if item in Expecting.__slots__:
@@ -135,7 +129,10 @@ def export(module, name, value=_nothing):
     """
 
     if isinstance(module, text):
-        module = importlib.import_module(module)
+        try:
+            module = importlib.import_module(module)
+        except Exception as cause:
+            _error(module + " can not be found")
     if not isinstance(name, text):
         # GET MODULE OF THE CALLER TO FIND NAME OF OBJECT
         value = name
@@ -225,7 +222,6 @@ def delay_import(module):
 
 
 class DelayedImport(object):
-
     __slots__ = ["caller", "module"]
 
     def __init__(self, caller, module):
