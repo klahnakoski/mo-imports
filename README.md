@@ -2,6 +2,14 @@
 
 A couple of methods to make late importing cleaner
 
+
+|Branch      |Status   |
+|------------|---------|
+|master      | [![Build Status](https://app.travis-ci.com/klahnakoski/mo-imports.svg?branch=master)](https://travis-ci.com/github/klahnakoski/mo-imports) |
+|dev         | [![Build Status](https://app.travis-ci.com/klahnakoski/mo-imports.svg?branch=dev)](https://travis-ci.com/github/klahnakoski/mo-imports)    |
+
+
+
 ## Problem
 
 Splitting code into modules is nice, but it can result in cyclic dependencies.  
