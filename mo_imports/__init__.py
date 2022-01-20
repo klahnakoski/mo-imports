@@ -272,3 +272,7 @@ class DelayedImport(object):
     def __getattribute__(self, item):
         m = DelayedImport._import_now(self)
         return getattr(m, item)
+
+    def __setattr__(self, item, value):
+        m = DelayedImport._import_now(self)
+        return setattr(m, item, value)
