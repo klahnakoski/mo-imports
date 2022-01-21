@@ -23,6 +23,14 @@ class TestExport(TestCase):
             if "expected to throw" not in cause:
                 raise Exception("not expected")
 
+    def test_delay_set(self):
+        from tests.module_set_attr import delay_set
+        delay_set(self)
+
+    def test_delay_get(self):
+        from tests.module_get_attr import delay_get
+        delay_get(self)
+
     def test_modname_name1(self):
         from tests.modname_name1.foos import foo
         _ = foo
