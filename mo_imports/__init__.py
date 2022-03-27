@@ -248,18 +248,23 @@ class DelayedImport(object):
             _error("Can not find variable holding a " + self.__class__.__name__)
 
         path = module.split(".")
-        module_name, short_name = ".".join(path[:-1]), path[-1]
         try:
-            m = importlib.import_module(module_name)
-            val = getattr(m, short_name)
-            _set(self, "module", val)
-            _set(self, "caller", None)
-
-            for n in names:
-                setattr(caller, n, val)
-            return val
+            if len(path)==1:
+                module_name = path[0]
+                val = importlib.import_module(module_name)
+            else:
+                module_name, short_name = ".".join(path[:-1]), path[-1]
+                m = importlib.import_module(module_name)
+                val = getattr(m, short_name)
         except Exception as cause:
             _error("Can not load " + _get(self, "module") + " caused by " + text(cause))
+
+        _set(self, "module", val)
+        _set(self, "caller", None)
+
+        for n in names:
+            setattr(caller, n, val)
+        return val
 
     def __call__(self, *args, **kwargs):
         m = DelayedImport._import_now(self)
