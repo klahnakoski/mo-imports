@@ -4,7 +4,7 @@ import mo_imports
 from mo_imports import delay_import
 
 Log = delay_import("mo_logs.Log")
-
+threading = delay_import("threading")
 
 class TestExport(TestCase):
 
@@ -30,6 +30,10 @@ class TestExport(TestCase):
     def test_delay_get(self):
         from tests.module_get_attr import delay_get
         delay_get(self)
+
+    def test_delay_simple_get(self):
+        from tests.module_get_simple_attr import delay_simple_get
+        delay_simple_get(self)
 
     def test_modname_name1(self):
         from tests.modname_name1.foos import foo
