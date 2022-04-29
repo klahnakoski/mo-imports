@@ -15,5 +15,5 @@ setup(
     name='mo-imports',
     packages=["mo_imports"],
     url='https://github.com/klahnakoski/mo-imports',
-    version='7.163.22119'
+    version='7.165.22119'
 )
