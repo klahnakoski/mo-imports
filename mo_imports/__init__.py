@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 import importlib
 import sys
 from threading import Thread, Event
-from time import time, sleep
+from time import time
 
 from mo_future import text, allocate_lock
 
@@ -217,6 +217,8 @@ def delay_import(module):
     """
     globals = sys._getframe(1).f_globals
     caller_name = globals["__name__"]
+    if not caller_name:
+        _error("Can not get name of calling module")
 
     return DelayedImport(caller_name, module)
 
@@ -231,8 +233,6 @@ class DelayedImport(object):
     def _import_now(self):
         module = _get(self, "module")
         caller_name = _get(self, "caller")
-        if not caller_name:
-            return module
 
         # FIND MODULE VARIABLE THAT HOLDS self
         caller = importlib.import_module(caller_name)
@@ -275,6 +275,8 @@ class DelayedImport(object):
         return m[item]
 
     def __getattribute__(self, item):
+        if item == "__class__":
+            return _get(self, item)
         m = DelayedImport._import_now(self)
         return getattr(m, item)
 
