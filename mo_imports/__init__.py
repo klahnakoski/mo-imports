@@ -275,6 +275,8 @@ class DelayedImport(object):
         return m[item]
 
     def __getattribute__(self, item):
+        if item == "__class__":
+            return _get(self, item)
         m = DelayedImport._import_now(self)
         return getattr(m, item)
 
