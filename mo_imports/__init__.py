@@ -217,9 +217,6 @@ def delay_import(module):
     """
     globals = sys._getframe(1).f_globals
     caller_name = globals["__name__"]
-    if not caller_name:
-        _error("Can not get name of calling module")
-
     return DelayedImport(caller_name, module)
 
 
@@ -227,6 +224,9 @@ class DelayedImport(object):
     __slots__ = ["caller", "module"]
 
     def __init__(self, caller, module):
+        if not caller:
+            _error("Can not get name of calling module")
+
         _set(self, "caller", caller)
         _set(self, "module", module)
 
@@ -276,7 +276,8 @@ class DelayedImport(object):
 
     def __getattribute__(self, item):
         if item == "__class__":
-            return _get(self, item)
+            # reflective code, like in unittest, need to know what this is
+            return DelayedImport
         m = DelayedImport._import_now(self)
         return getattr(m, item)
 
