@@ -4,8 +4,8 @@ python:
   - "3.9"
 
 install:
-  - pip install .
   - pip install -r tests/requirements.txt
+  - pip install .
 
 env:
   - PYTHONPATH=.
