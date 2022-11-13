@@ -1,15 +1,11 @@
 language: python
 python:
-  - "3.7.9"
-  - "3.9"
-
+- 3.7.8
+- 3.9
 install:
-  - pip install .
-  - pip install -r tests/requirements.txt
-
+- pip install -r tests/requirements.txt
+- pip install .
 env:
-  - PYTHONPATH=.
-
-# command to run tests
+- PYTHONPATH=.
 script:
-  - python -m unittest discover tests
+- python -m unittest discover tests
