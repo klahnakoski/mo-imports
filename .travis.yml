@@ -4,6 +4,7 @@ python:
 - 3.9
 install:
 - pip install -r tests/requirements.txt
+- cp packaging/setup.py .
 - pip install .
 env:
 - PYTHONPATH=.
