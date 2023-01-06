@@ -1,3 +1,4 @@
 /.idea
 .svn
-setup.py
+./setup.py
+
