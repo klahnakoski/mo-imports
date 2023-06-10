@@ -6,9 +6,6 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
-
 import importlib
 import sys
 from threading import Thread, Event
