@@ -71,3 +71,6 @@ class TestExport(TestCase):
 
     def test_delay_import(self):
         pass
+
+    def test_delay_import2(self):
+        self.assertEqual(mo_imports.WAIT_FOR_EXPORT, 10)
