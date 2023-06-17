@@ -2,5 +2,7 @@
 .svn
 
 /setup.py
-
+__pycache__
+build
+*.egg-info
 
