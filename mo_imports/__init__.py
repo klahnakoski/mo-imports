@@ -8,17 +8,18 @@
 #
 import importlib
 import sys
+from datetime import datetime
 from threading import Thread, Event
 from time import time
 
 from mo_future import text, allocate_lock
 
 DEBUG = False
-WAIT_FOR_EXPORT = 10  # SECONDS TO WAIT FROM MOST RECENT expect() TO LAST export()
+WAIT_FOR_EXPORT = 10000  # SECONDS TO WAIT FROM MOST RECENT expect() TO LAST export()
 
 _locker = allocate_lock()
 _expectations = []
-_expiry = None
+_expiry = time()
 _monitor = None
 _nothing = object()
 _set = object.__setattr__
@@ -51,7 +52,7 @@ def expect(*names):
 
     if DEBUG:
         for name in names:
-            print(">>> " + desc.module.__name__ + " is expecting " + name)
+            print(f">>> {desc.module.__name__} is expecting {name}")
 
     if len(output) == 1:
         return output[0]
@@ -100,7 +101,7 @@ class Expecting(object):
         self()
 
     def __str__(self):
-        return "Expect: " + self.module.__name__ + "." + self.name
+        return f"Expect: {self.module.__name__}.{self.name}"
 
 
 def export(module, name, value=_nothing):
@@ -130,7 +131,7 @@ def export(module, name, value=_nothing):
         try:
             module = importlib.import_module(module)
         except Exception as cause:
-            _error(module + " can not be found")
+            _error(f"{module} can not be found")
     if not isinstance(name, text):
         # GET MODULE OF THE CALLER TO FIND NAME OF OBJECT
         value = name
@@ -146,7 +147,7 @@ def export(module, name, value=_nothing):
             except Exception:
                 pass
         else:
-            _error("Can not find variable holding a " + value.__class__.__name__)
+            _error(f"Can not find variable holding a {value.__class__.__name__}")
     if value is _nothing:
         # ASSUME CALLER MODULE IS USED
         globals = sys._getframe(1).f_globals
@@ -163,11 +164,11 @@ def export(module, name, value=_nothing):
                         _event.set()
                     break
             else:
-                _error(module.__name__ + " is not expecting an export to " + name)
+                _error(f"{module.__name__} is not expecting an export to {name}")
         if DEBUG:
-            print(">>> " + module.__name__ + " got expected " + name)
+            print(f">>> {module.__name__} got expected {name}")
     else:
-        _error(module.__name__ + " is not expecting an export to " + name)
+        _error(f"{module.__name__} is not expecting an export to {name}")
 
     setattr(module, name, value)
 
@@ -178,6 +179,8 @@ def worker(please_stop):
     if DEBUG:
         print(">>> expectation thread started")
     while True:
+        if DEBUG:
+            print(f">>> wait for {_expiry - time()} seconds (until {unix_to_date(_expiry)})")
         please_stop.wait(_expiry - time())
         with _locker:
             if not _expectations:
@@ -189,17 +192,15 @@ def worker(please_stop):
             done, _expectations = _expectations, []
 
         for d in done:
-            sys.stderr.write(
-                'missing expected call export("'
-                + d.module.__name__
-                + '", '
-                + d.name
-                + ")\n"
-            )
+            sys.stderr.write(f"missing expected call export({d.module.__name__}, {d.name})\n")
         _error("Missing export() calls")
 
     if DEBUG:
         print(">>> expectation thread ended")
+
+
+def unix_to_date(unix):
+    return datetime.fromtimestamp(unix).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def _error(description):
@@ -243,11 +244,11 @@ class DelayedImport(object):
                 pass
 
         if not names:
-            _error("Can not find variable holding a " + self.__class__.__name__)
+            _error("Can not find variable holding a {self.__class__.__name__}")
 
         path = module.split(".")
         try:
-            if len(path)==1:
+            if len(path) == 1:
                 module_name = path[0]
                 val = importlib.import_module(module_name)
             else:
@@ -255,7 +256,7 @@ class DelayedImport(object):
                 m = importlib.import_module(module_name)
                 val = getattr(m, short_name)
         except Exception as cause:
-            _error("Can not load " + _get(self, "module") + " caused by " + text(cause))
+            _error(f"Can not load {_get(self, 'module')} caused by {cause}")
 
         _set(self, "module", val)
         _set(self, "caller", None)
@@ -288,6 +289,7 @@ class DelayedValue(object):
     """
     can be used on module-level variables to delay creation
     """
+
     __slots__ = ["builder", "caller"]
 
     def __init__(self, builder):
@@ -308,7 +310,7 @@ class DelayedValue(object):
             except Exception:
                 pass
         else:
-            _error("Can not find variable holding a " + self.__class__.__name__)
+            _error(f"Can not find variable holding a {self.__class__.__name__}")
 
         value = _get(self, "builder")()
         setattr(caller, name, value)
@@ -336,4 +338,3 @@ class DelayedValue(object):
     def __setattr__(self, item, value):
         m = DelayedValue._build(self)
         return setattr(m, item, value)
-
