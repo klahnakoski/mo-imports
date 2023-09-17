@@ -289,18 +289,15 @@ class DelayedValue(object):
     """
     can be used on module-level variables to delay creation
     """
-
-    __slots__ = ["builder", "caller"]
+    __slots__ = ["builder"]
 
     def __init__(self, builder):
-        globals = sys._getframe(1).f_globals
-        caller_name = globals["__name__"]
-        caller = importlib.import_module(caller_name)
         _set(self, "builder", builder)
-        _set(self, "caller", caller)
 
     def _build(self):
-        caller = _get(self, "caller")
+        globals = sys._getframe(2).f_globals
+        caller_name = globals["__name__"]
+        caller = importlib.import_module(caller_name)
         name = ""
         for n in dir(caller):
             try:
