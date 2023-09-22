@@ -11,6 +11,11 @@ from unittest import TestCase
 import mo_imports
 
 
-class TestExport(TestCase):
+class TestBasic(TestCase):
     def test_wait_time(self):
         self.assertEqual(mo_imports.WAIT_FOR_EXPORT, 10)
+
+    def test_delayed_value(self):
+        from tests.delayed_value2 import value
+        self.assertIsInstance(value, str)
+        self.assertEqual(value, "hello world")
