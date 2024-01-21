@@ -1,6 +1,6 @@
 # More Imports! - Delayed importing 
 
-A couple of methods to make late importing cleaner
+A few methods to make late importing cleaner
 
 
 |Branch      |Status   |
@@ -38,7 +38,7 @@ def bar():
 
 ## More Imports!
 
-### Solution: Use `expect`/`export` pattern
+### Solution #1: Use `expect`/`export` pattern
 
 All your cyclic dependencies are covered with this one pattern: Break cycles by `expect`ing a name in the first module, and let the second module `export` to the first when the value is available
 
@@ -75,7 +75,7 @@ export("bars", bar)
 * all "imports" are at the top of the file
 
 
-### Solution: Use `delay_import`
+### Solution #2: Use `delay_import`
 
 Provide a proxy which is responsible for import upon first use of the module variable.
 
@@ -83,7 +83,6 @@ Provide a proxy which is responsible for import upon first use of the module var
 
 ```python
 from mo_imports import delay_import
-from bars import bar
 
 bar = delay_import("bars.bar")
 
@@ -101,10 +100,20 @@ def bar():
     foo()
 ```
 
-This is the cleanest, but it requires any of `__call__`, `__getitem__`, `__getattr__` to be called. Sentinals, placeholders, and default values can not be imported this way
 
-
+**Benefits**
   
+* cleaner code 
+* costly imports are delayed until first use
+
+
+> WARNING
+> 
+> Requires any of `__call__`, `__getitem__`, `__getattr__` to be called to trigger the
+> import.  This means sentinals, placeholders, and default values can NOT be imported 
+> using `delay_import()`
+
+
 ## Other solutions
 
 If you do not use `mo-imports` your import cycles can be broken using one of the following common patterns:
@@ -125,7 +134,6 @@ You can declare yet-another-module that holds the cycles
 ```
 
 but this breaks the code modularity
-
 
 
 ### Bad Solution: Use end-of-file imports
@@ -211,3 +219,31 @@ def bar():
 Placeholders variables are added, which linters complain about type. There is the added `_late_import()` method. You risk it is not run everywhere as needed. This has less overhead than an inline import, but there is still a check.
  
 
+## More on importing
+
+Importing a complex modular library is still hard; the complexity comes from the the order *other modules* declare their imports; you have no control over which of your modules will be imported first.  For example, one module may 
+
+```python
+from my_lib.bars import bar
+from my_lib.foos import foo
+```
+
+another module may choose the opposite order
+
+```python
+from my_lib.foos import foo
+from my_lib.bars import bar
+```
+
+### Ordering imports
+
+With cyclic dependencies, ordering the imports can get tricky.  Here are some rules 
+
+* choose your principle modules and the order you want them imported.
+* your remaining modules are assumed to be imported in alphabetical order (as most linters prefer)
+* **use top level `__init__.py` to control the order of imports**
+* encourage third party modules to use this top level module.  for example
+  ```python
+  from my_lib import foo, bar
+  ```
+* finally, use `mo_imports` to break cycles
