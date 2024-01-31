@@ -12,7 +12,7 @@
     ],
     "description": "More Imports! - Delayed importing",
     "extras_require": {"tests": ["mo-logs"]},
-    "install_requires": ["mo-future==7.507.24028"],
+    "install_requires": ["mo-future==7.519.24031"],
     "license": "MPL 2.0",
     "long_description": {
         "$concat": [
@@ -273,5 +273,5 @@
     "name": "mo-imports",
     "packages": ["mo_imports"],
     "url": "https://github.com/klahnakoski/mo-imports",
-    "version": "5.509.24030"
+    "version": "5.519.24031"
 }
