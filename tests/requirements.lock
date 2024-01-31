@@ -1,6 +1,7 @@
+# Tests pass with these versions 2024-01-31T03:41:17Z
 mo-dots==9.508.24028
-mo-future==7.507.24028
-mo-imports==5.509.24030
+mo-future==7.519.24031
+mo-imports==5.519.24031
 mo-kwargs==7.508.24028
 mo-logs==8.508.24028
 pip==23.3.2
