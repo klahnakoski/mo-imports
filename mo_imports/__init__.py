@@ -293,7 +293,6 @@ class DelayedValue(object):
     """
     can be used on module-level variables to delay creation
     """
-
     __slots__ = ["builder"]
 
     def __init__(self, builder):
