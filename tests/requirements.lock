@@ -1,5 +1,5 @@
-# Tests pass with these versions 2024-02-07
-mo-dots==9.531.24035
-mo-future==7.541.24038
-mo-kwargs==7.531.24035
-mo-logs==8.538.24037
+# Tests pass with these versions 2024-02-26
+mo-dots==9.543.24046
+mo-future==7.546.24057
+mo-kwargs==7.543.24046
+mo-logs==8.543.24046
