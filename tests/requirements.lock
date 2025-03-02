@@ -1,6 +1,6 @@
-# Tests pass with python 3.9 on 2025-02-28 and with these versions
+# Tests pass with python 3.9 on 2025-03-02 and with these versions
 # pip install --no-deps -r tests/requirements.lock
 mo-dots==10.672.25036
-mo-future==7.676.25059
+mo-future==7.678.25061
 mo-kwargs==7.672.25036
 mo-logs==8.672.25036
