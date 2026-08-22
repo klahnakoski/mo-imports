@@ -1,6 +1,6 @@
 # Tests pass with python 3.12 on 2026-08-22 and with these versions
 # pip install --no-deps -r tests/requirements-3.12.lock
 mo-dots==10.685.25166
-mo-future==7.686.26234
+mo-future==7.687.26234
 mo-kwargs==8.703.26061
 mo-logs==8.703.26061

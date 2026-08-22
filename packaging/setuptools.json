@@ -14,8 +14,8 @@
         "Programming Language :: Python :: 3.15"
     ],
     "description": "More Imports! - Delayed importing",
-    "extras_require": {"tests": ["mo-logs>=8.684.25166"]},
-    "install_requires": ["mo-future==7.686.26234"],
+    "extras_require": {"tests": ["mo-logs>=8.703.26061"]},
+    "install_requires": ["mo-future==7.687.26234"],
     "license": "MPL 2.0",
     "long_description": {
         "$concat": [
@@ -276,5 +276,5 @@
     "name": "mo-imports",
     "packages": ["mo_imports"],
     "url": "https://github.com/klahnakoski/mo-imports",
-    "version": "7.686.26234"
+    "version": "7.687.26234"
 }
